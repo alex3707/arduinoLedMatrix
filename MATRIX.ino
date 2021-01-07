@@ -1,94 +1,41 @@
-//#include <FastLED.h> a
-#include "FastLED.h"
-String runningText = "";
-
-#define BRIGHTNESS 30
-//FastLED.addLeds<WS2812, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
- // FastLED.setBrightness(BRIGHTNESS);
-
-// How many leds in your strip?
-#define NUM_LEDS 256
-
-// For led chips like WS2812, which have a data line, ground, and power, you just
-// need to define DATA_PIN.  For led chipsets that are SPI based (four wires - data, clock,
-// ground, and power), like the LPD8806 define both DATA_PIN and CLOCK_PIN
-// Clock pin only needed for SPI based chipsets when not using hardware SPI
-#define DATA_PIN 2
-//#define CLOCK_PIN 13
-
-// Define the array of leds
-CRGB leds[NUM_LEDS];
-
-void setup() { 
-    // Uncomment/edit one of the following lines for your leds arrangement.
-    // ## Clockless types ##
-    FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);  // GRB ordering is assumed
-    // FastLED.addLeds<SM16703, DATA_PIN, RGB>(leds, NUM_LEDS);
-    // FastLED.addLeds<TM1829, DATA_PIN, RGB>(leds, NUM_LEDS);
-    // FastLED.addLeds<TM1812, DATA_PIN, RGB>(leds, NUM_LEDS);
-    // FastLED.addLeds<TM1809, DATA_PIN, RGB>(leds, NUM_LEDS);
-    // FastLED.addLeds<TM1804, DATA_PIN, RGB>(leds, NUM_LEDS);
-    // FastLED.addLeds<TM1803, DATA_PIN, RGB>(leds, NUM_LEDS);
-    // FastLED.addLeds<UCS1903, DATA_PIN, RGB>(leds, NUM_LEDS);
-    // FastLED.addLeds<UCS1903B, DATA_PIN, RGB>(leds, NUM_LEDS);
-    // FastLED.addLeds<UCS1904, DATA_PIN, RGB>(leds, NUM_LEDS);
-    // FastLED.addLeds<UCS2903, DATA_PIN, RGB>(leds, NUM_LEDS);
-     //FastLED.addLeds<WS2812, DATA_PIN, RGB>(leds, NUM_LEDS);  // GRB ordering is typical
-    // FastLED.addLeds<WS2852, DATA_PIN, RGB>(leds, NUM_LEDS);  // GRB ordering is typical
-    // FastLED.addLeds<WS2812B, DATA_PIN, RGB>(leds, NUM_LEDS);  // GRB ordering is typical
-    // FastLED.addLeds<GS1903, DATA_PIN, RGB>(leds, NUM_LEDS);
-    // FastLED.addLeds<SK6812, DATA_PIN, RGB>(leds, NUM_LEDS);  // GRB ordering is typical
-    // FastLED.addLeds<SK6822, DATA_PIN, RGB>(leds, NUM_LEDS);
-    // FastLED.addLeds<APA106, DATA_PIN, RGB>(leds, NUM_LEDS);
-    // FastLED.addLeds<PL9823, DATA_PIN, RGB>(leds, NUM_LEDS);
-    // FastLED.addLeds<SK6822, DATA_PIN, RGB>(leds, NUM_LEDS);
-    // FastLED.addLeds<WS2811, DATA_PIN, RGB>(leds, NUM_LEDS);
-    // FastLED.addLeds<WS2813, DATA_PIN, RGB>(leds, NUM_LEDS);
-    // FastLED.addLeds<APA104, DATA_PIN, RGB>(leds, NUM_LEDS);
-    // FastLED.addLeds<WS2811_400, DATA_PIN, RGB>(leds, NUM_LEDS);
-    // FastLED.addLeds<GE8822, DATA_PIN, RGB>(leds, NUM_LEDS);
-    // FastLED.addLeds<GW6205, DATA_PIN, RGB>(leds, NUM_LEDS);
-    // FastLED.addLeds<GW6205_400, DATA_PIN, RGB>(leds, NUM_LEDS);
-    // FastLED.addLeds<LPD1886, DATA_PIN, RGB>(leds, NUM_LEDS);
-    // FastLED.addLeds<LPD1886_8BIT, DATA_PIN, RGB>(leds, NUM_LEDS);
-    // ## Clocked (SPI) types ##
-    // FastLED.addLeds<LPD6803, DATA_PIN, CLOCK_PIN, RGB>(leds, NUM_LEDS);  // GRB ordering is typical
-    // FastLED.addLeds<LPD8806, DATA_PIN, CLOCK_PIN, RGB>(leds, NUM_LEDS);  // GRB ordering is typical
-    // FastLED.addLeds<WS2801, DATA_PIN, CLOCK_PIN, RGB>(leds, NUM_LEDS);
-    // FastLED.addLeds<WS2803, DATA_PIN, CLOCK_PIN, RGB>(leds, NUM_LEDS);
-    // FastLED.addLeds<SM16716, DATA_PIN, CLOCK_PIN, RGB>(leds, NUM_LEDS);
-    // FastLED.addLeds<P9813, DATA_PIN, CLOCK_PIN, RGB>(leds, NUM_LEDS);  // BGR ordering is typical
-    // FastLED.addLeds<DOTSTAR, DATA_PIN, CLOCK_PIN, RGB>(leds, NUM_LEDS);  // BGR ordering is typical
-    // FastLED.addLeds<APA102, DATA_PIN, CLOCK_PIN, RGB>(leds, NUM_LEDS);  // BGR ordering is typical
-    // FastLED.addLeds<SK9822, DATA_PIN, CLOCK_PIN, RGB>(leds, NUM_LEDS);  // BGR ordering is typical
-    FastLED.setBrightness(BRIGHTNESS);
-}
-//int i=0, k=0;
-
-  
+#define STRIP_PIN 2     // пин ленты
+// для генерации битмапа используется программа imageProcessor
+// https://github.com/AlexGyver/imageProcessor
+// со стандартными настройками, выбираем только глубину цвета (RGB888/565/232)
+// остальные - PROGMEM вкл, массив 1D
+const uint16_t bitmap_8x8[] PROGMEM = {
+  0x792A, 0x792A, 0x792A, 0x792A, 0x792A, 0x792A, 0x792A, 0x792A, 
+  0x792A, 0x792A, 0x0000, 0x0000, 0x0000, 0x0000, 0x792A, 0x792A, 
+  0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x792A, 0x792A, 0x0000, 
+  0x0000, 0x0000, 0x0000, 0x0000, 0x792A, 0x792A, 0x0000, 0x0000, 
+  0x0000, 0x0000, 0x0000, 0x792A, 0x792A, 0x0000, 0x0000, 0x0000, 
+  0x0000, 0x0000, 0x0000, 0x792A, 0x792A, 0x0000, 0x0000, 0x0000, 
+  0x0000, 0x0000, 0x0000, 0x792A, 0x792A, 0x0000, 0x0000, 0x0000, 
+  0x0000, 0x0000, 0x0000, 0x792A, 0x792A, 0x0000, 0x0000, 0x0000, 
+};
 
 
+#define COLOR_DEBTH 2
+#include <microLED.h>
+microLED<16 * 16, STRIP_PIN, MLED_NO_CLOCK, LED_WS2812, ORDER_GRB, CLI_HIGH> matrix(16, 16, ZIGZAG, LEFT_TOP, DIR_DOWN);
 
-  
-  
 
-  
-void loop() { 
-  Turn the LED on, then pause
- for(int i = 0; i <= 256;){
-  
-  leds[i] = CRGB::Red;
-  //delay(1);
-  //i=i+1;
-  //FastLED.show();
- // if (i==256){
-  //  for(int k = 0; k <= 256;){
-   //  leds[k] = CRGB::Black;
-   //  FastLED.show();
-   //  delay(1);
-   //  k++;
-  //  }
-  //  }
+void setup() {
+      matrix.setBrightness(50);
  
-  FastLED.show(); 
-  }
+  
+  // также есть drawBitmap8 и drawBitmap32
+  // (x, y, массив, ширина, высота)
+}
+
+void loop() {
+
+      for (int i = 14; i>-7; i--){
+      matrix.drawBitmap16(i, 0, bitmap_8x8, 8, 8);
+      matrix.setBrightness(50);
+      matrix.show();
+      delay(40);
+      matrix.clear();}
+
+
+}
