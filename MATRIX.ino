@@ -8,28 +8,72 @@
 
 #define COLOR_DEBTH 2
 #include <microLED.h>
+#include <FastLEDsupport.h> 
+#define BALLS_AMOUNT 20
+boolean loadingFlag = true;
+int coord[BALLS_AMOUNT][2];
+#define M_WIDTH 16    // ширина матрицы
+#define M_HEIGHT 16    // высота матрицы
+int8_t vector[BALLS_AMOUNT][2];
+mData ballColors[BALLS_AMOUNT];
 microLED<16 * 16, STRIP_PIN, MLED_NO_CLOCK, LED_WS2812, ORDER_GRB, CLI_HIGH> matrix(16, 16, ZIGZAG, LEFT_TOP, DIR_DOWN);
 int i=1;
 
 void setup() {
       matrix.setBrightness(50);
- 
-  
-  // также есть drawBitmap8 и drawBitmap32
-  // (x, y, массив, ширина, высота)
+      palka();
+
 }
 
 void loop() {
+     
+      balls();
+      matrix.show();
+      delay(30);
+}
 
+void balls() {
+  if (loadingFlag) {
+    loadingFlag = false;
+    for (byte j = 0; j < BALLS_AMOUNT; j++) {
+      int sign;
+      // забиваем случайными данными
+      coord[j][0] = M_WIDTH / 2 * 10;
+      random8(0, 2) ? sign = 1 : sign = -1;
+      vector[j][0] = random8(4, 15) * sign;
+      coord[j][1] = M_HEIGHT / 2 * 10;
+      random8(0, 2) ? sign = 1 : sign = -1;
+      vector[j][1] = random8(4, 15) * sign;
+      ballColors[j] = mWheel8(random8(0, 9) * 28);
+    }
+  }
 
-//      for (int i = 14; i>-7; i--){
-//      matrix.drawBitmap16(i, 0, bitmap_8x8, 8, 8);
-//      matrix.setBrightness(50);
-//      matrix.show();
-//      delay(40);
-//      matrix.clear();}
-      
-      while(i > 0 && i <= 31){
+  matrix.clear();  // очистить
+
+  // движение шариков
+  for (byte j = 0; j < BALLS_AMOUNT; j++) {
+    for (byte i = 0; i < 2; i++) {
+      coord[j][i] += vector[j][i];
+      if (coord[j][i] < 0) {
+        coord[j][i] = 0;
+        vector[j][i] = -vector[j][i];
+      }
+    }
+    if (coord[j][0] > (M_WIDTH - 1) * 10) {
+      coord[j][0] = (M_WIDTH - 1) * 10;
+      vector[j][0] = -vector[j][0];
+    }
+    if (coord[j][1] > (M_HEIGHT - 1) * 10) {
+      coord[j][1] = (M_HEIGHT - 1) * 10;
+      vector[j][1] = -vector[j][1];
+    }
+    matrix.set(coord[j][0] / 10, coord[j][1] / 10, ballColors[j]);
+  }
+}
+
+void palka(){
+
+     for(int i = 0; i <= 10; i++){
       matrix.drawBitmap16(5, 5, frame00, 8, 8);
       matrix.show();
       delay(20);
@@ -52,21 +96,7 @@ void loop() {
 
       matrix.drawBitmap16(5, 5, frame04, 8, 8);
       matrix.show();
-      delay(20);
-      //matrix.clear();
-      i++;
-      int j=0;
-      if (i%10==0){
-        //int j = random();
-        matrix.drawBitmap16(5, 5, frame05, 8, 8);
-        matrix.show();
-        delay(1000);
-        }
-       else if (i==31){
-        break;
-        }
+      delay(20); 
       }
-      
-
-
-}
+      matrix.clear();
+  }
